@@ -1,4 +1,4 @@
-# stemp
+![GitHub Logo](/media/logo.png)
 This package aims to help the loading, compiling and managing data of Golang's Templates.
 
 ### Installation
@@ -7,12 +7,26 @@ This package aims to help the loading, compiling and managing data of Golang's T
 go get "github.com/gale93/stemp"
 ```
 
+### Template's folder
+
+In this folder we have 2 different type of files
+
+* .tmpl
+* .html
+
+stemp will compiles the templates and make them viable in the following way:
+Pseudo code:
+```
+For Each [Html file]
+	Join it all [.tmpl] files...
+```
+
 ### Code Sample
 
 You will have a base.tmpl file that looks like this:
 
 base.tmpl
-```html5
+```html
 {{define "base"}}
 <!doctype html>
 
@@ -45,7 +59,7 @@ base.tmpl
 And a index.html who is the specific content while the user land on main page:
 
 index.html
-```html5
+```html
 {{define "content"}}
 	<h1> Welcome </h1>
 {{end}}
@@ -90,19 +104,4 @@ func main() {
 	http.ListenAndServe(":9393", nil)
 }
 
-```
-
-
-### Template's folder
-
-In this folder we have 2 different type of files
-
-* .tmpl
-* .html
-
-stemp will compiles the templates and make them viable in the following way:
-Pseudo code:
-```
-For Each [Html file]
-	Join it all [.tmpl] files...
 ```
