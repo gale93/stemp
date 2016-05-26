@@ -36,13 +36,19 @@ func NewStemplate(templatesDirectory string) (*Stemplate, error) {
 // load function will store in RAM the , just compiled, templates.
 func (st *Stemplate) load() error {
 
+	templates, terr := filepath.Glob(st.templatesDir + "*.tmpl")
+	if terr != nil {
+		return terr
+	}
+
 	contents, err := filepath.Glob(st.templatesDir + "*.html")
 	if err != nil {
 		return err
 	}
 
 	for _, c := range contents {
-		st.templates[filepath.Base(c)] = template.Must(template.ParseFiles(c, st.templatesDir+"base.tmpl"))
+		current := append(templates, c)
+		st.templates[filepath.Base(c)] = template.Must(template.ParseFiles(current...))
 	}
 
 	return nil
