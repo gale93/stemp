@@ -55,16 +55,33 @@ func (st *Stemplate) load() error {
 
 }
 
+// loadTemplate will load at run time the desidered temp
+func (st *Stemplate) loadTemplate(tname string) *template.Template {
+
+	templates, terr := filepath.Glob(st.templatesDir + "*.tmpl")
+	if terr != nil {
+		fmt.Println("[JIT template]: ERROR ~ " + terr.Error())
+		return nil
+	}
+
+	templates = append(templates, st.templatesDir+tname)
+
+	return template.Must(template.ParseFiles(templates...))
+}
+
 // Reload is an utily function that allow to recompile templates at run time
 func (st *Stemplate) Reload() {
+
+	// useless if we are using live reload
+	if st.LiveReload {
+		return
+	}
 
 	stReloaded, err := NewStemplate(st.templatesDir)
 	if err != nil {
 		fmt.Println("[Reloading templates]: ERROR")
 		return
 	}
-
-	stReloaded.LiveReload = st.LiveReload
 
 	st = stReloaded
 }
@@ -75,7 +92,7 @@ func (st *Stemplate) Render(w *http.ResponseWriter, templateName string) {
 	if !st.LiveReload {
 		st.templates[templateName].ExecuteTemplate(*w, "base", nil)
 	} else {
-		template.Must(template.ParseFiles(st.templatesDir+templateName, st.templatesDir+"base.tmpl")).ExecuteTemplate(*w, "base", nil)
+		st.loadTemplate(templateName).ExecuteTemplate(*w, "base", nil)
 	}
 
 }
