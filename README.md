@@ -21,6 +21,35 @@ For Each [Html file]
 	Join it all [.tmpl] files...
 ```
 
+### Pass Data to templates
+
+Handling data is very easy because it's already done !
+
+Stemp struct has these two functions :
+
+```Go
+	AddData(name string, data interface{})
+	RemoveData(name string)
+```
+
+So you can manage the data you want to cast to template in 2 different ways:
+
+1. You can add static data you ALWAYS want to pass to all templates just calling AddData() function one time at the start of the program
+
+2. You can pass specific data to the template and Remove() it after it is used. Somewhat like this:
+
+```Go
+func fakehandler(w http.ResponseWriter, r *http.Request) {
+
+	st.AddData("lottery_numbers", []int{3, 2, 9, 2, 3, 12})
+
+	st.Render(&w, "home.html")
+
+	st.RemoveData("lottery_numbers")
+}
+```
+
+
 ### Code Sample
 
 You will have a base.tmpl file that looks like this:
@@ -37,14 +66,14 @@ base.tmpl
   <title>Stemp</title>
   <meta name="description" content="Stemp">
   <meta name="author" content="Matteo Galeotti">
-  
+
   {{template "includes" .}}
-  
+
 </head>
 
 <body>
 	<nav></nav>
-	
+
 	<div id="content">
 		{{template "content" .}}
 	</div>
@@ -81,6 +110,8 @@ import (
 var st *stemp.Stemplate
 
 func handler(w http.ResponseWriter, r *http.Request) {
+
+	st.AddData("anything_you_want", &TheStructYouNeed)
 	st.Render(&w, "index.html")
 }
 
@@ -88,10 +119,10 @@ func main() {
 	var err error
 	// Just give to Stemplate Plugin the folder of your templates and it will do the rest
 	st, err = stemp.NewStemplate("./views/")
-	
-	// Use this when you are in development and dont want to restart server after modify html files 
+
+	// Use this when you are in development and dont want to restart server after modify html files
 	st.LiveReload = true
-	
+
 
 	if err != nil {
 		fmt.Println("error initialitating Stemplate")

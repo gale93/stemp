@@ -16,6 +16,7 @@ type Stemplate struct {
 
 	templatesDir string
 	templates    map[string]*template.Template
+	data         map[string]interface{}
 }
 
 //NewStemplate create a new Istance of Stemplate obj
@@ -25,6 +26,7 @@ func NewStemplate(templatesDirectory string) (*Stemplate, error) {
 	st.templatesDir = templatesDirectory
 	st.LiveReload = false
 	st.templates = make(map[string]*template.Template)
+	st.data = make(map[string]interface{})
 
 	if err := st.load(); err != nil {
 		return nil, err
@@ -83,6 +85,8 @@ func (st *Stemplate) Reload() {
 		return
 	}
 
+	stReloaded.data = st.data
+
 	st = stReloaded
 }
 
@@ -90,9 +94,20 @@ func (st *Stemplate) Reload() {
 func (st *Stemplate) Render(w *http.ResponseWriter, templateName string) {
 
 	if !st.LiveReload {
-		st.templates[templateName].ExecuteTemplate(*w, "base", nil)
+		st.templates[templateName].ExecuteTemplate(*w, "base", st.data)
 	} else {
-		st.loadTemplate(templateName).ExecuteTemplate(*w, "base", nil)
+		st.loadTemplate(templateName).ExecuteTemplate(*w, "base", st.data)
 	}
 
+}
+
+// AddData will add the desidered obj to a template and will add it every time
+// that template is executed
+func (st *Stemplate) AddData(name string, data interface{}) {
+	st.data[name] = data
+}
+
+// RemoveData is used when you dont need specific obj to be passed anymore to your template
+func (st *Stemplate) RemoveData(name string) {
+	delete(st.data, name)
 }
