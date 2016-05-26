@@ -86,7 +86,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	var err error
-	// Just give to Stemplate Plugin the folder of your templates and it will do de rest
+	// Just give to Stemplate Plugin the folder of your templates and it will do the rest
 	st, err = stemp.NewStemplate("./views/")
 	
 	// Use this when you are in development and dont want to restart server after modify html files 
